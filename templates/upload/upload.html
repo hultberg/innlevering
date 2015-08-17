@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <h1>{{compo.name}}</h1>
+    <h2>Last opp bidrag til {{compo.name}}</h2>
+</div>
+
+<div class="content">
+    <form class="pure-form pure-form-stacked" action="{% url 'core:upload_handle' compo.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <fieldset>
+
+            <label for="name">Navn</label>
+            <input id="name" name="title" type="text" placeholder="Navn på bidrag...">
+
+            <label for="file">Fil</label>
+            <input id="file" name="file" type="file" />
+
+            <button type="submit" class="pure-button pure-button-primary">Last opp</button>
+        </fieldset>
+    </form>
+</div>
+{% endblock %}
