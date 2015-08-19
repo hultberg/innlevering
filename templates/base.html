@@ -29,6 +29,7 @@
             <ul class="pure-menu-list">
                 <li class="pure-menu-item"><a href="{% url 'core:index' %}" class="pure-menu-link">Hjem</a></li>
                 {% if isLoggedin %}
+                    <li class="pure-menu-item"><a href="{% url 'core:accountview' %}" class="pure-menu-link">Min konto</a></li>
                     <li class="pure-menu-item"><a href="{% url 'core:logoutview' %}" class="pure-menu-link">Logg ut</a></li>
                 {% else %}
                     <li class="pure-menu-item"><a href="{% url 'core:registerview' %}" class="pure-menu-link">Lag bruker</a></li>

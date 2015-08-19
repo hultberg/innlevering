@@ -7,18 +7,29 @@
 </div>
 
 <div class="content">
-    <form class="pure-form pure-form-stacked" action="{% url 'core:upload_handle' compo.id %}" method="post" enctype="multipart/form-data">
+    <p>Når du leverer inn bidrag så må din brukerinformasjon stemme med det som er registrert i Geekevents eller kan bidraget bli diskvalifisert.</p>
+    <form class="pure-form pure-form-aligned" action="{% url 'core:upload_handle' compo.id %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         <fieldset>
+            <div class="pure-control-group">
+                <label for="name">Navn</label>
+                <input id="name" name="title" type="text" class="pure-input-1-2" placeholder="Navn på bidrag...">
+            </div>
 
-            <label for="name">Navn</label>
-            <input id="name" name="title" type="text" placeholder="Navn på bidrag...">
+            <div class="pure-control-group">
+                <label for="description">Beskrivelse</label>
+                <textarea id="description" class="pure-input-1-2" name="description" placeholder="Skriv en beskrivelse av bidraget..."></textarea>
+            </div>
 
-            <label for="file">Fil</label>
-            <input id="file" name="file" type="file" />
+            <div class="pure-control-group">
+                <label for="file">Fil</label>
+                <input id="file" name="file" type="file" />
+            </div>
 
-            <button type="submit" class="pure-button pure-button-primary">Last opp</button>
+            <div class="pure-controls">
+                <button type="submit" class="pure-button pure-button-primary">Last opp</button>
+            </div>
         </fieldset>
     </form>
 </div>

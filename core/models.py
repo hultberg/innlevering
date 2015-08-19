@@ -13,6 +13,7 @@ def update_filename(instance, filename):
 class Compo(models.Model):
     name = models.CharField(max_length=120)
     description = models.TextField()
+    htmlContent = models.TextField(default="")
 
     #
     def __str__(self):
@@ -21,6 +22,7 @@ class Compo(models.Model):
 
 class Bidrag(models.Model):
     name = models.CharField(max_length=120)
+    data = models.TextField()
     fileLocation = models.CharField(max_length=230)
     created = models.DateTimeField(auto_now=True)
     compo = models.ForeignKey("Compo")

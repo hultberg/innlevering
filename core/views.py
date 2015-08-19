@@ -3,8 +3,10 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+import pprint
 
 from .models import Compo, Bidrag
+from .forms import AccountSettingsForm
 
 
 def indexview(request):
@@ -33,12 +35,28 @@ def compoview(request, composlug):
 
 
 # ----------------------------------------------------
+# Account view
+def accountview(request):
+    c = {}
+
+    if request.user.is_authenticated() is not True:
+        return HttpResponseRedirect("/")
+
+    c['isLoggedin'] = True
+    c['user'] = request.user
+
+    return render(request, 'account/view.html', c)
+
+
+# ----------------------------------------------------
 # Upload bidrag	
 def uploadview(request, composlug):
     c = {}
 
-    if request.user.is_authenticated() is True:
+    if request.user.is_authenticated() is not True:
         return HttpResponseRedirect("/")
+
+    c['isLoggedin'] = True
 
     # fetch compo
     c['compo'] = get_object_or_404(Compo, id=composlug)
@@ -69,7 +87,7 @@ def registerview(request):
         else:
             c['error_message'] = 'Alle felter er påkrevd'
 
-    return render(request, "register.html", c)
+    return render(request, "account/register.html", c)
 
 
 #-----------------------------------------------------
@@ -94,7 +112,7 @@ def loginview(request):
         else:
             c['error_message'] = 'Alle felter er påkrevd'
 
-    return render(request, "login.html", c)
+    return render(request, "account/login.html", c)
 
 
 #-----------------------------------------------------
