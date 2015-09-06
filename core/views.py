@@ -1,9 +1,10 @@
 from pprint import pprint
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from core._core_functions import user_is_crew
 
 from .models import Compo, Bidrag, BidragFile
 
@@ -25,12 +26,45 @@ def compoview(request, composlug):
     c = {}
 
     # fetch compo
-    c['compo'] = get_object_or_404(Compo, id=composlug)
+    try:
+        theCompo = Compo.objects.get(pk=composlug)
+    except Compo.DoesNotExist:
+        raise Http404("Compo was not found")
+
+    c['pageTitle'] = theCompo.name
+    c['compo'] = theCompo
+    c['bidrags'] = theCompo.get_bidrag()
 
     if request.user.is_authenticated():
         c['isLoggedin'] = True
+        c['user'] = request.user
+        c['isCrew'] = user_is_crew(request.user)
 
     return render(request, 'compos/view.html', c)
+
+
+# ----------------------------------------------------
+# View bidrags in compo
+def compobidragview(request, composlug):
+    c = {}
+
+    if not request.user.is_authenticated() or not user_is_crew(request.user):
+        return HttpResponseForbidden()
+
+    # fetch compo
+    try:
+        theCompo = Compo.objects.get(pk=composlug)
+    except Compo.DoesNotExist:
+        raise Http404("Compo was not found")
+
+    c['pageTitle'] = theCompo.name
+    c['compo'] = theCompo
+    c['bidrags'] = theCompo.get_bidrag()
+    c['isLoggedin'] = True
+    c['user'] = request.user
+    c['isCrew'] = user_is_crew(request.user)
+
+    return render(request, 'compos/see_bidrags.html', c)
 
 
 # ----------------------------------------------------
@@ -56,6 +90,7 @@ def uploadview(request, composlug):
         return HttpResponseRedirect("/")
 
     c['isLoggedin'] = True
+    c['user'] = request.user
 
     # fetch compo
     c['compo'] = get_object_or_404(Compo, id=composlug)
@@ -131,7 +166,7 @@ def uploadhandler(request, composlug):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        instance = Bidrag(compo=theCompo, votes=0, name=request.POST['title'])
+        instance = Bidrag(compo=theCompo, creator=request.user, votes=0, name=request.POST['title'])
         instance.save()
 
         for afile in request.FILES.getlist("files"):

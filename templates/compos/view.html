@@ -8,7 +8,12 @@
 
 <div class="content">
     {% if isLoggedin %}
-        <p><a class="pure-button" href="{% url 'core:upload' compo.id %}">Last opp bidrag</a></p>
+        <p>
+            <a class="pure-button" href="{% url 'core:upload' compo.id %}">Last opp bidrag</a>
+            {% if isCrew %}
+                <a class="pure-button" href="{% url 'core:viewbidrag' compo.id %}">Vis bidrag</a>
+            {% endif %}
+        </p>
     {% else %}
         <p>For å laste opp et bidrag, må du være innlogget.</p>
     {% endif %}

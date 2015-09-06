@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <h1>{{compo.name}}</h1>
+    <h2>Vis alle bidrag i {{compo.name}}</h2>
+</div>
+
+<div class="content">
+    {% if isCrew %}
+    <h3>Alle bidrag</h3>
+    <p>Her er en oversikt over alle bidrag sendt inn.</p>
+
+        {% if bidrags %}
+            {% for bidrag in bidrags %}
+                <div class="bidrag">
+                    <h4>{{bidrag.name}}</h4>
+                    <p><em>Innsendt fra <strong>{{bidrag.creatorName}}</strong></em></p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p><em>Ingen bidrag er blitt sendt inn.</em></p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
