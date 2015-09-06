@@ -1,12 +1,11 @@
+from pprint import pprint
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-import pprint
 
-from .models import Compo, Bidrag
-from .forms import AccountSettingsForm
+from .models import Compo, Bidrag, BidragFile
 
 
 def indexview(request):
@@ -60,7 +59,7 @@ def uploadview(request, composlug):
 
     # fetch compo
     c['compo'] = get_object_or_404(Compo, id=composlug)
-    return render(request, 'upload/upload.html', c)
+    return render(request, 'upload.html', c)
 
 
 #-----------------------------------------------------
@@ -132,10 +131,14 @@ def uploadhandler(request, composlug):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        instance = Bidrag(compo=theCompo, votes=0, name=request.POST['name'], file=request.FILES['file'])
+        instance = Bidrag(compo=theCompo, votes=0, name=request.POST['title'])
         instance.save()
-        return HttpResponseRedirect('/')
+
+        for afile in request.FILES.getlist("files"):
+            BidragFile(bidrag=instance, file=afile).save()
+
+        return HttpResponseRedirect('/view/' + str(theCompo.id) + '/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        return HttpResponseRedirect('/view/' + theCompo.id + '/upload/')
+        return HttpResponseRedirect('/view/' + str(theCompo.id) + '/upload/')
