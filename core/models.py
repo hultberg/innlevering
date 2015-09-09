@@ -39,15 +39,16 @@ class Bidrag(models.Model):
 
     # Provides all files for this compo.
     def get_files(self):
-        return BidragFile.objects.get(bidrag=self)
+        return BidragFile.objects.filter(bidrag=self)
 
     # Provides number of files for this compo.
     def get_num_files(self):
         return self.get_files().count()
 
     @property
-    def creatorName(self):
-        return self.creator.username
+    def get_thebidrag_file(self):
+        if self.get_num_files() > 0:
+            return self.get_files()[0]
 
 
 class BidragFile(models.Model):

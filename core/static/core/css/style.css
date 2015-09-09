@@ -250,3 +250,32 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
 }
 
+.bidrag-view .meta {
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.bidrag-list .bidrag {
+    border-top: 1px solid #eeeeee;
+    padding: 10px 0;
+    overflow: hidden;
+}
+
+.bidrag-list .bidrag .thumbnail {
+    float: left;
+    margin-right: 10px;
+}
+
+.bidrag-list .bidrag .thumbnail img {
+    max-width: 80px;
+}
+
+.bidrag-list .bidrag p.meta {
+    font-size: 0.9rem;
+}
+
+.bidrag-list .bidrag p,
+.bidrag-list .bidrag h4 {
+    margin: 0;
+}
+

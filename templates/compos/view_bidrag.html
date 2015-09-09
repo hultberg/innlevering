@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <h1>{{compo.name}}</h1>
+    <h2>Viser bidrag {{bidrag.name}}</h2>
+</div>
+
+<div class="content bidrag-view">
+    <p>
+        <a class="pure-button" href="{% url 'core:viewbidrag' compo.id %}">Til alle bidrag</a>
+    </p>
+    {% if isCrew %}
+    <p class="meta">Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creatorName}}</p>
+    <p>{{bidrag.data}}</p>
+    <div class="files">
+        <h3>Filer</h3>
+        {% if bnumfiles > 0 %}
+        <ul>
+            {% for file in bfiles %}
+            <li><a href="{{file.file.url}}">{{file.file.name}}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

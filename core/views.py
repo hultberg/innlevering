@@ -68,6 +68,35 @@ def compobidragview(request, composlug):
 
 
 # ----------------------------------------------------
+# View single bidrag in compo
+def composinglebidragview(request, composlug, bidragslug):
+    c = {}
+
+    if not request.user.is_authenticated() or not user_is_crew(request.user):
+        return HttpResponseForbidden()
+
+    # fetch compo
+    try:
+        theCompo = Compo.objects.get(pk=composlug)
+        theBidrag = Bidrag.objects.get(id=bidragslug, compo=theCompo)
+    except Compo.DoesNotExist:
+        raise Http404("Compo was not found")
+    except Bidrag.DoesNotExist:
+        raise Http404("Bidrag was not found")
+
+    c['pageTitle'] = theBidrag.name + ' / ' + theCompo.name
+    c['compo'] = theCompo
+    c['bidrag'] = theBidrag
+    c['bnumfiles'] = theBidrag.get_num_files()
+    c['bfiles'] = theBidrag.get_files()
+    c['isLoggedin'] = True
+    c['user'] = request.user
+    c['isCrew'] = user_is_crew(request.user)
+
+    return render(request, 'compos/view_bidrag.html', c)
+
+
+# ----------------------------------------------------
 # Account view
 def accountview(request):
     c = {}

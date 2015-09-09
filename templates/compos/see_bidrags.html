@@ -7,17 +7,30 @@
 </div>
 
 <div class="content">
+    <p>
+        <a class="pure-button" href="{% url 'core:view_compo' compo.id %}">Til konkurranse</a>
+    </p>
     {% if isCrew %}
     <h3>Alle bidrag</h3>
     <p>Her er en oversikt over alle bidrag sendt inn.</p>
 
         {% if bidrags %}
+            <div class="bidrag-list">
             {% for bidrag in bidrags %}
                 <div class="bidrag">
-                    <h4>{{bidrag.name}}</h4>
-                    <p><em>Innsendt fra <strong>{{bidrag.creatorName}}</strong></em></p>
+                    {% if bidrag.get_thebidrag_file %}
+                        <div class="thumbnail">
+                            <img src="{{bidrag.get_thebidrag_file.file.url}}" alt="Image" />
+                        </div>
+                    {% endif %}
+                    <h4><a href="{% url 'core:viewsinglebidrag' compo.id bidrag.id %}">{{bidrag.name}}</a></h4>
+                    {% if bidrag.data %}
+                        <p>{{bidrag.data}}</p>
+                    {% endif %}
+                    <p class="meta"><em>Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creatorName}}</em></p>
                 </div>
             {% endfor %}
+            </div>
         {% else %}
             <p><em>Ingen bidrag er blitt sendt inn.</em></p>
         {% endif %}
