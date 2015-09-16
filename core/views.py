@@ -1,4 +1,5 @@
-from pprint import pprint
+
+# coding=utf-8
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
