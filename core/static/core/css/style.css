@@ -279,3 +279,12 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     margin: 0;
 }
 
+.files {
+    width: 50%;
+    display: inline-block;
+    border-radius: 4px;
+    vertical-align: middle;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
