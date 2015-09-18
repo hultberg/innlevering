@@ -34,6 +34,7 @@
             <ul class="pure-menu-list">
                 <li class="pure-menu-item"><a href="{% url 'core:index' %}" class="pure-menu-link">Hjem</a></li>
                 {% if isLoggedin %}
+                    <li class="pure-menu-item"><a href="{% url 'core:mybidrags' %}" class="pure-menu-link">Mine bidrag</a></li>
                     <li class="pure-menu-item"><a href="{% url 'core:accountview' %}" class="pure-menu-link">Min konto</a></li>
                     <li class="pure-menu-item"><a href="{% url 'core:logoutview' %}" class="pure-menu-link">Logg ut</a></li>
                 {% else %}

@@ -101,6 +101,10 @@ def composinglebidragview(request, composlug, bidragslug):
     c['isCrew'] = user_is_crew(request.user)
     c['hasAccess'] = True  # Access forbidden is be catched over
 
+    # Show success message?
+    if request.GET.get("uploaded", False):
+        c['successMessage'] = "Ditt bidrag har blitt innlevert!"
+
     return render(request, 'compos/view_bidrag.html', c)
 
 
@@ -247,6 +251,19 @@ def loginview(request):
 
 
 #-----------------------------------------------------
+# View users bidrags
+def mybidrags(request):
+    if request.user.is_authenticated() is not True:
+        return HttpResponseRedirect("/")
+
+    c = {}
+    c['isLoggedin'] = True
+    c['bidrags'] = Bidrag.objects.filter(creator=request.user)
+
+    return render(request, "account/mybidrags.html", c)
+
+
+#-----------------------------------------------------
 # Logout form
 def logouthandle(request):
     logout(request)
@@ -269,7 +286,7 @@ def uploadhandler(request, composlug):
         for afile in request.FILES.getlist("files"):
             BidragFile(bidrag=instance, file=afile).save()
 
-        return HttpResponseRedirect('/view/' + str(theCompo.id) + '/')
+        return HttpResponseRedirect('/view/' + str(theCompo.id) + '/b/' + str(instance.id) + '/?uploaded=true')
 
     # if a GET (or any other method) we'll create a blank form
     else:

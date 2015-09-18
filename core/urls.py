@@ -15,5 +15,6 @@ urlpatterns = patterns('',
     url(r'^account/register/', views.registerview, name='registerview'),
     url(r'^account/logout/', views.logouthandle, name='logoutview'),
     url(r'^account/view/', views.accountview, name='accountview'),
+    url(r'^account/bidrags/', views.mybidrags, name='mybidrags'),
     url(r'^$', views.indexview, name='index'),
 )
