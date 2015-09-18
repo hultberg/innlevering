@@ -7,12 +7,30 @@
 </div>
 
 <div class="content bidrag-view">
+    {% if successMessage %}
+    <div class="alert alert-success">{{successMessage}}</div>
+    {% endif %}
+
     <p>
+        {% if isCrew %}
         <a class="pure-button" href="{% url 'core:viewbidrag' compo.id %}">Til alle bidrag</a>
+        {% endif %}
+        <a class="pure-button" href="javascript:void(0);" onclick="toggleEditMode();">Rediger</a>
+        <a class="pure-button" href="{% url 'core:bidragdelete' compo.id bidrag.id %}">Slett</a>
     </p>
-    {% if isCrew %}
-    <p class="meta">Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creator_name}}</p>
-    <p>{{bidrag.data}}</p>
+
+    <form class="editform" action="{% url 'core:bidrageditsave' compo.id bidrag.id %}" method="post">
+        {% csrf_token %}
+        <h1 class="editmode-labels">{{bidrag.name}}</h1>
+        <div class="editmode-form" id="editmode-form-name"><input type="text" name="title" value="{{bidrag.name}}" /></div>
+
+        <p class="meta">Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creator_name}}</p>
+
+        <div class="editmode-labels" id="editmode-plain-text"><p>{{bidrag.data}}</p></div>
+        <div class="editmode-form" id="editmode-form-text"><p><textarea name="data">{{bidrag.data}}</textarea></p></div>
+
+        <div class="editmode-form" id="editmode-form-submit"><input type="submit" value="Lagre" /></div>
+    </form>
     <div class="files">
         <h3>Filer</h3>
         {% if bnumfiles > 0 %}
@@ -23,6 +41,5 @@
         </ul>
         {% endif %}
     </div>
-    {% endif %}
 </div>
 {% endblock %}

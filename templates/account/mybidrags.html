@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <h1>Mine bidrag</h1>
+    <h2>Viser alle dine bidrag</h2>
+</div>
+
+<div class="content">
+    {% if bidrags %}
+        <div class="bidrag-list">
+        {% for bidrag in bidrags %}
+            <div class="bidrag">
+                {% if bidrag.get_thebidrag_file %}
+                    <div class="thumbnail">
+                        <img src="{{bidrag.get_thebidrag_file.file.url}}" alt="Image" />
+                    </div>
+                {% endif %}
+                <h4><a href="{% url 'core:viewsinglebidrag' bidrag.compo.id bidrag.id %}">{{bidrag.name}}</a></h4>
+                {% if bidrag.data %}
+                    <p>{{bidrag.data}}</p>
+                {% endif %}
+                <p class="meta"><em>Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creator_name}}</em></p>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p><em>Ingen bidrag ble funnet.</em></p>
+    {% endif %}
+</div>
+{% endblock %}
