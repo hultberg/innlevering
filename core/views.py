@@ -85,6 +85,12 @@ def composinglebidragview(request, composlug, bidragslug):
     except Bidrag.DoesNotExist:
         raise Http404("Bidrag was not found")
 
+    # Check if user in session has access to this page.
+    # Only crew or uploader can view.
+    if user_is_crew(request.user) is False or request.user.id != theBidrag.creator.id:
+        return HttpResponseForbidden()  # No access to view this..
+
+    # Set params for view
     c['pageTitle'] = theBidrag.name + ' / ' + theCompo.name
     c['compo'] = theCompo
     c['bidrag'] = theBidrag
@@ -93,8 +99,69 @@ def composinglebidragview(request, composlug, bidragslug):
     c['isLoggedin'] = True
     c['user'] = request.user
     c['isCrew'] = user_is_crew(request.user)
+    c['hasAccess'] = True  # Access forbidden is be catched over
 
     return render(request, 'compos/view_bidrag.html', c)
+
+
+# ----------------------------------------------------
+# View single bidrag in compo
+def bidragdelete(request, composlug, bidragslug):
+    c = {}
+
+    if not request.user.is_authenticated() or not user_is_crew(request.user):
+        return HttpResponseForbidden()
+
+    # fetch compo
+    try:
+        theCompo = Compo.objects.get(pk=composlug)
+        theBidrag = Bidrag.objects.get(id=bidragslug, compo=theCompo)
+    except Compo.DoesNotExist:
+        raise Http404("Compo was not found")
+    except Bidrag.DoesNotExist:
+        raise Http404("Bidrag was not found")
+
+    # Check if user in session has access to this page.
+    # Only crew or uploader can view.
+    if user_is_crew(request.user) is False or request.user.id != theBidrag.creator.id:
+        return HttpResponseForbidden()  # No access to view this..
+
+    # Delete this bidrag
+    theBidrag.delete()
+
+    # Redir to compo
+    return HttpResponseRedirect("/view/" + theCompo.id + "/")
+
+
+# ----------------------------------------------------
+# View single bidrag in compo
+def bidrageditsave(request, composlug, bidragslug):
+    c = {}
+
+    if not request.user.is_authenticated() or not user_is_crew(request.user):
+        return HttpResponseForbidden()
+
+    # fetch compo
+    try:
+        theCompo = Compo.objects.get(pk=composlug)
+        theBidrag = Bidrag.objects.get(id=bidragslug, compo=theCompo)
+    except Compo.DoesNotExist:
+        raise Http404("Compo was not found")
+    except Bidrag.DoesNotExist:
+        raise Http404("Bidrag was not found")
+
+    # Check if user in session has access to this page.
+    # Only crew or uploader can view.
+    if user_is_crew(request.user) is False or request.user.id != theBidrag.creator.id:
+        return HttpResponseForbidden()  # No access to view this..
+
+    # Save this bidrag
+    theBidrag.name = request.POST["title"]
+    theBidrag.data = request.POST["data"]
+    theBidrag.save()
+
+    # Redir to compo
+    return HttpResponseRedirect("/view/" + str(theCompo.id) + "/b/" + str(theBidrag.id) + "/")
 
 
 # ----------------------------------------------------

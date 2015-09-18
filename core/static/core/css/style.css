@@ -288,3 +288,5 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.editmode-form {display:none;}
