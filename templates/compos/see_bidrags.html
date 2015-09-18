@@ -27,7 +27,7 @@
                     {% if bidrag.data %}
                         <p>{{bidrag.data}}</p>
                     {% endif %}
-                    <p class="meta"><em>Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creatorName}}</em></p>
+                    <p class="meta"><em>Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creator_name}}</em></p>
                 </div>
             {% endfor %}
             </div>

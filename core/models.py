@@ -46,6 +46,10 @@ class Bidrag(models.Model):
         return self.get_files().count()
 
     @property
+    def creator_name(self):
+        return self.creator.username
+
+    @property
     def get_thebidrag_file(self):
         if self.get_num_files() > 0:
             return self.get_files()[0]
