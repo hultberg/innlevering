@@ -73,8 +73,8 @@ def compobidragview(request, composlug):
 def composinglebidragview(request, composlug, bidragslug):
     c = {}
 
-    if not request.user.is_authenticated() or not user_is_crew(request.user):
-        return HttpResponseForbidden()
+    if request.user.is_authenticated() is False:
+        return HttpResponseForbidden("You are not logged in")
 
     # fetch compo
     try:
@@ -85,10 +85,12 @@ def composinglebidragview(request, composlug, bidragslug):
     except Bidrag.DoesNotExist:
         raise Http404("Bidrag was not found")
 
+    isOwner = (request.user.id == theBidrag.creator.id)
+
     # Check if user in session has access to this page.
     # Only crew or uploader can view.
-    if user_is_crew(request.user) is False or request.user.id != theBidrag.creator.id:
-        return HttpResponseForbidden()  # No access to view this..
+    if not user_is_crew(request.user) and not isOwner:
+        return HttpResponseForbidden("No access")  # No access to view this..
 
     # Set params for view
     c['pageTitle'] = theBidrag.name + ' / ' + theCompo.name
