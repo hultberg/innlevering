@@ -1,13 +1,14 @@
 
 # coding=utf-8
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from core._core_functions import user_is_crew
+import requests
 
-from .models import Compo, Bidrag, BidragFile
+from .models import Compo, Bidrag, BidragFile, InnleveringUser
 
 
 def indexview(request):
@@ -201,55 +202,43 @@ def uploadview(request, composlug):
 
 
 #-----------------------------------------------------
-# Register form
-def registerview(request):
-    c = {}
-
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        firstName = request.POST['first_name']
-        lastName = request.POST['last_name']
-
-        if len(username) > 0 and len(email) > 0 and len(password) > 0 and len(firstName) > 0 and len(lastName) > 0:
-            try:
-                user = User.objects.create_user(username, email, password)
-                user.first_name = firstName
-                user.last_name = lastName
-                user.save()
-                c['createdUser'] = username
-            except IntegrityError:
-                c['error_message'] = 'Brukernavnet finnes allerede'
-        else:
-            c['error_message'] = 'Alle felter er påkrevd'
-
-    return render(request, "account/register.html", c)
-
-
-#-----------------------------------------------------
 # Login form
 def loginview(request):
     c = {}
 
-    if request.method == 'POST':
-        gotUsername = request.POST['username']
-        gotPassword = request.POST['password']
+    if request.method == 'GET' and int(request.GET['id']) > 0 and request.GET['timestamp'] and request.GET['token']:
+        # Validate the session from GE
+        params = {"user_id": request.GET['id'], "timestamp": request.GET['timestamp'], "token": request.GET['token']}
+        r = requests.post("https://www.geekevents.org/sso/validate/", params)
+        rj = r.json()
 
-        if len(gotUsername) > 0 and len(gotPassword) > 0:
-            user = authenticate(username=gotUsername, password=gotPassword)
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponseRedirect("/")
-                else:
-                    c['error_message'] = 'Brukeren er deaktivert'
+        if rj['status']:
+            # Create an user in the our database with extra information.
+            foundUser = InnleveringUser.objects.filter(geID=request.GET['id'])
+
+            # Has user?
+            if foundUser.count() < 1:
+                # Create a new user for this one.
+                # Fetch userinfo
+                userinfo = requests.post("https://www.geekevents.org/sso/userinfo/", params)
+                userinfojson = userinfo.json()
+                if userinfojson['status'] is False:
+                    raise HttpResponse("Userinfo request failed, contact game-desk!")
+
+                user = User.objects.create_user(username=userinfojson['username'])
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                innleveringuser = InnleveringUser(geID=int(request.GET['id']), geUsername=userinfojson['username'], user=user)
+                innleveringuser.save()
             else:
-                c['error_message'] = 'Brukernavn eller passord er feil'
-        else:
-            c['error_message'] = 'Alle felter er påkrevd'
+                innuser = foundUser[0]
+                user = User.objects.get(pk=innuser.user.id)
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
 
-    return render(request, "account/login.html", c)
+            # Login the user
+            login(request, user)
+            return HttpResponseRedirect("/?login=true")
+
+    return HttpResponseRedirect("/?login=failed")
 
 
 #-----------------------------------------------------

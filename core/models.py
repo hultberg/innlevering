@@ -2,12 +2,24 @@ from django.db import models
 import time
 import os
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
 def update_filename(instance, filename):
     path = "bidrag/" + time.strftime('%d-%Y') + "/"
     format = filename
     return os.path.join(path, format)
+
+
+# Create your models here.
+class InnleveringUser(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    geID = models.IntegerField()
+    geUsername = models.TextField(default="")
+
+    #
+    def __str__(self):
+        return self.geUsername
 
 
 # Create your models here.

@@ -38,8 +38,7 @@
                     <li class="pure-menu-item"><a href="{% url 'core:accountview' %}" class="pure-menu-link">Min konto</a></li>
                     <li class="pure-menu-item"><a href="{% url 'core:logoutview' %}" class="pure-menu-link">Logg ut</a></li>
                 {% else %}
-                    <li class="pure-menu-item"><a href="{% url 'core:registerview' %}" class="pure-menu-link">Lag bruker</a></li>
-                    <li class="pure-menu-item"><a href="{% url 'core:loginview' %}" class="pure-menu-link">Logg inn</a></li>
+                    <li class="pure-menu-item"><a href="https://www.geekevents.org/sso/?next={% url 'core:loginview' %}" class="pure-menu-link">Logg inn</a></li>
                 {% endif %}
             </ul>
         </div>
