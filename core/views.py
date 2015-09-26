@@ -137,7 +137,7 @@ def bidragdelete(request, composlug, bidragslug):
     theBidrag.delete()
 
     # Redir to compo
-    return HttpResponseRedirect("/view/" + theCompo.id + "/")
+    return HttpResponseRedirect("/view/" + str(theCompo.id) + "/")
 
 
 # ----------------------------------------------------
