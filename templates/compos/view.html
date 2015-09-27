@@ -9,7 +9,12 @@
 <div class="content">
     {% if isLoggedin %}
         <p>
-            <a class="pure-button" href="{% url 'core:upload' compo.id %}">Last opp bidrag</a>
+            {% if userHasBidragID %}
+                <a class="pure-button" href="{% url 'core:viewsinglebidrag' compo.id userHasBidragID.id %}">Vis mitt bidrag</a>
+            {% else %}
+                <a class="pure-button" href="{% url 'core:upload' compo.id %}">Last opp bidrag</a>
+            {% endif %}
+
             {% if isCrew %}
                 <a class="pure-button" href="{% url 'core:viewbidrag' compo.id %}">Vis bidrag</a>
             {% endif %}

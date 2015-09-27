@@ -10,10 +10,13 @@
     {% if successMessage %}
     <div class="alert alert-success">{{successMessage}}</div>
     {% endif %}
+    {% if errorMessage %}
+    <div class="alert alert-danger">{{errorMessage}}</div>
+    {% endif %}
 
     <p>
         {% if isCrew %}
-        <a class="pure-button" href="{% url 'core:viewbidrag' compo.id %}">Til alle bidrag</a>
+        <a class="pure-button" href="{% url 'core:viewbidrag' compo.id %}">Til alle bidragene</a>
         {% endif %}
         <a class="pure-button" href="javascript:void(0);" onclick="toggleEditMode();">Rediger</a>
         <a class="pure-button" href="{% url 'core:bidragdelete' compo.id bidrag.id %}">Slett</a>

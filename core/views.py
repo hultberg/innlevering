@@ -37,6 +37,12 @@ def compoview(request, composlug):
     c['compo'] = theCompo
     c['bidrags'] = theCompo.get_bidrag()
 
+    # User has already sent bidrag?
+    bidragUserCompo = Bidrag.objects.filter(compo=theCompo, creator=request.user)
+    if bidragUserCompo.count() > 0:
+        bidragUserCompo = bidragUserCompo[0]
+        c['userHasBidragID'] = bidragUserCompo
+
     if request.user.is_authenticated():
         c['isLoggedin'] = True
         c['user'] = request.user
@@ -108,6 +114,10 @@ def composinglebidragview(request, composlug, bidragslug):
     if request.GET.get("uploaded", False):
         c['successMessage'] = "Ditt bidrag har blitt innlevert!"
 
+    # Show error message?
+    if request.GET.get("error"):
+        c['errorMessage'] = "Du har allerede levert et bidrag!"
+
     return render(request, 'compos/view_bidrag.html', c)
 
 
@@ -116,7 +126,7 @@ def composinglebidragview(request, composlug, bidragslug):
 def bidragdelete(request, composlug, bidragslug):
     c = {}
 
-    if not request.user.is_authenticated() or not user_is_crew(request.user):
+    if not request.user.is_authenticated():
         return HttpResponseForbidden()
 
     # fetch compo
@@ -128,10 +138,12 @@ def bidragdelete(request, composlug, bidragslug):
     except Bidrag.DoesNotExist:
         raise Http404("Bidrag was not found")
 
+    isOwner = (request.user.id == theBidrag.creator.id)
+
     # Check if user in session has access to this page.
     # Only crew or uploader can view.
-    if user_is_crew(request.user) is False or request.user.id != theBidrag.creator.id:
-        return HttpResponseForbidden()  # No access to view this..
+    if not user_is_crew(request.user) and not isOwner:
+        return HttpResponseForbidden("No access")  # No access to view this..
 
     # Delete this bidrag
     theBidrag.delete()
@@ -145,7 +157,7 @@ def bidragdelete(request, composlug, bidragslug):
 def bidrageditsave(request, composlug, bidragslug):
     c = {}
 
-    if not request.user.is_authenticated() or not user_is_crew(request.user):
+    if not request.user.is_authenticated():
         return HttpResponseForbidden()
 
     # fetch compo
@@ -157,10 +169,12 @@ def bidrageditsave(request, composlug, bidragslug):
     except Bidrag.DoesNotExist:
         raise Http404("Bidrag was not found")
 
+    isOwner = (request.user.id == theBidrag.creator.id)
+
     # Check if user in session has access to this page.
     # Only crew or uploader can view.
-    if user_is_crew(request.user) is False or request.user.id != theBidrag.creator.id:
-        return HttpResponseForbidden()  # No access to view this..
+    if not user_is_crew(request.user) and not isOwner:
+        return HttpResponseForbidden("No access")  # No access to view this..
 
     # Save this bidrag
     theBidrag.name = request.POST["title"]
@@ -267,6 +281,15 @@ def uploadhandler(request, composlug):
     c = {}
 
     theCompo = get_object_or_404(Compo, id=composlug)
+
+    # Check if the user already has uploaded
+    userBidragsInCompo = Bidrag.objects.filter(creator=request.user, compo=theCompo)
+    if userBidragsInCompo.count() > 0:
+        # User has already uploaded a bidrag
+        theBidragUserHas = userBidragsInCompo[0]
+
+        # Return to the bidrag
+        return HttpResponseRedirect("/view/" + str(theCompo.id) + "/b/" + str(theBidragUserHas.id) + "/?error=1")
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
