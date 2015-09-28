@@ -24,11 +24,13 @@ class InnleveringUser(models.Model):
 
 # Create your models here.
 class Compo(models.Model):
-    name = models.CharField(max_length=120)
-    description = models.TextField()
-    htmlContent = models.TextField(default="")
+    name         = models.CharField(max_length=120)
+    description  = models.TextField()
+    htmlContent  = models.TextField(default="")
+    isPublished  = models.BooleanField(default=False)
+    isVotingMode = models.BooleanField(default=False)
 
-    #
+    # 
     def __str__(self):
         return self.name
 

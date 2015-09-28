@@ -7,6 +7,11 @@
 </div>
 
 <div class="content">
+
+    {% if errorMessage %}
+        <div class="alert alert-danger">{{errorMessage}}</div>
+    {% endif %}
+
     <p>Denne tjenesten krever at du logger inn med din GeekEvents-konto for å levere et bidrag, trykk <strong>Logg inn</strong> på sidemenyen.</p>
     <p>Velg en konkurranse for å levere inn ditt bidrag.</p>
 
@@ -16,7 +21,9 @@
         <ul class="pure-menu-list">
             {% if compos %}
             {% for compo in compos %}
+                {% if compo.isPublished %}
                 <li class="pure-menu-item"><a href="/view/{{compo.id}}" class="pure-menu-link">{{compo.name}}</a></li>
+                {% endif %}
             {% endfor %}
             {% endif %}
         </ul>

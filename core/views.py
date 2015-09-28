@@ -17,6 +17,12 @@ def indexview(request):
     if request.user.is_authenticated():
         c['isLoggedin'] = True
 
+    # Has error?
+    if request.GET.get("error"):
+        print(request.GET.get("error"))
+        if request.GET.get("error") == "1":
+            c["errorMessage"] = "Konkurransen er ikke publisert"
+
     # fetch compos
     c['compos'] = Compo.objects.filter()
     return render(request, 'index.html', c)
@@ -32,6 +38,10 @@ def compoview(request, composlug):
         theCompo = Compo.objects.get(pk=composlug)
     except Compo.DoesNotExist:
         raise Http404("Compo was not found")
+
+    # is the compo published?
+    if not theCompo.isPublished:
+        return HttpResponseRedirect("/?error=1")
 
     c['pageTitle'] = theCompo.name
     c['compo'] = theCompo
@@ -59,6 +69,10 @@ def compobidragview(request, composlug):
     if not request.user.is_authenticated() or not user_is_crew(request.user):
         return HttpResponseForbidden()
 
+    # is the compo published?
+    if not theCompo.isPublished:
+        return HttpResponseRedirect("/?error=1")
+
     # fetch compo
     try:
         theCompo = Compo.objects.get(pk=composlug)
@@ -83,7 +97,7 @@ def composinglebidragview(request, composlug, bidragslug):
     if request.user.is_authenticated() is False:
         return HttpResponseForbidden("You are not logged in")
 
-    # fetch compo
+    # fetch compo and bidrag
     try:
         theCompo = Compo.objects.get(pk=composlug)
         theBidrag = Bidrag.objects.get(id=bidragslug, compo=theCompo)
@@ -92,11 +106,15 @@ def composinglebidragview(request, composlug, bidragslug):
     except Bidrag.DoesNotExist:
         raise Http404("Bidrag was not found")
 
+    # is the compo published?
+    if not theCompo.isPublished:
+        return HttpResponseRedirect("/?error=1")
+
     isOwner = (request.user.id == theBidrag.creator.id)
 
     # Check if user in session has access to this page.
     # Only crew or uploader can view.
-    if not user_is_crew(request.user) and not isOwner:
+    if not theCompo.isVotingMode and not user_is_crew(request.user) and not isOwner:
         return HttpResponseForbidden("No access")  # No access to view this..
 
     # Set params for view
@@ -212,6 +230,11 @@ def uploadview(request, composlug):
 
     # fetch compo
     c['compo'] = get_object_or_404(Compo, id=composlug)
+
+    # is the compo published?
+    if not theCompo.isPublished:
+        return HttpResponseRedirect("/?error=1")
+
     return render(request, 'upload.html', c)
 
 
