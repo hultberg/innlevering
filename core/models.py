@@ -16,6 +16,8 @@ class InnleveringUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     geID = models.IntegerField()
     geUsername = models.TextField(default="")
+    currenttoken = models.TextField(default="")
+    currenttimestamp = models.TextField(default="")
 
     #
     def __str__(self):

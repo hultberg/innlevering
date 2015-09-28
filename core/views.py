@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, Ht
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from core._core_functions import user_is_crew
+from core._core_functions import user_is_crew, get_innlevering_user
 import requests
 
 from .models import Compo, Bidrag, BidragFile, InnleveringUser
@@ -267,9 +267,13 @@ def loginview(request):
                 innleveringuser = InnleveringUser(geID=int(request.GET['id']), geUsername=userinfojson['username'], user=user)
                 innleveringuser.save()
             else:
-                innuser = foundUser[0]
-                user = User.objects.get(pk=innuser.user.id)
+                innleveringuser = foundUser[0]
+                user = User.objects.get(pk=innleveringuser.user.id)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
+
+            innleveringuser.currenttoken = request.GET["token"]
+            innleveringuser.currenttimestamp = request.GET["timestamp"]
+            innleveringuser.save()
 
             # Login the user
             login(request, user)
@@ -294,6 +298,14 @@ def mybidrags(request):
 #-----------------------------------------------------
 # Logout form
 def logouthandle(request):
+
+    # Clear API variables
+    innleveringuser = get_innlevering_user(request.user)
+    if innleveringuser:
+        innleveringuser.currenttoken = ""
+        innleveringuser.currenttimestamp = ""
+        innleveringuser.save()
+
     logout(request)
     return HttpResponseRedirect("/")
 
