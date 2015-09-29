@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, Ht
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from core._core_functions import user_is_crew, get_innlevering_user
+from core._core_functions import user_is_crew, get_innlevering_user, can_upload
 import requests
 
 from .models import Compo, Bidrag, BidragFile, InnleveringUser
@@ -235,6 +235,7 @@ def uploadview(request, composlug):
     if not theCompo.isPublished:
         return HttpResponseRedirect("/?error=1")
 
+    c['canUpload'] = can_upload(request.user)
     c['compo'] = theCompo
 
     return render(request, 'upload.html', c)

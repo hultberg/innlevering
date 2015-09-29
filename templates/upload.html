@@ -7,6 +7,7 @@
 </div>
 
 <div class="content">
+    {% if canUpload %}
     <p>Når du leverer inn bidrag så må din brukerinformasjon stemme med det som er registrert i Geekevents eller kan bidraget bli diskvalifisert.</p>
     <form class="pure-form pure-form-aligned" action="{% url 'core:upload_handle' compo.id %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -43,5 +44,8 @@
             </div>
         </fieldset>
     </form>
+    {% else %}
+    <p>Du har ingen billetter til arrangementet og kan derfor ikke laste opp et bidrag.</p>
+    {% endif %}
 </div>
 {% endblock %}
