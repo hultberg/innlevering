@@ -69,15 +69,15 @@ def compobidragview(request, composlug):
     if not request.user.is_authenticated() or not user_is_crew(request.user):
         return HttpResponseForbidden()
 
-    # is the compo published?
-    if not theCompo.isPublished:
-        return HttpResponseRedirect("/?error=1")
-
     # fetch compo
     try:
         theCompo = Compo.objects.get(pk=composlug)
     except Compo.DoesNotExist:
         raise Http404("Compo was not found")
+
+    # is the compo published?
+    if not theCompo.isPublished:
+        return HttpResponseRedirect("/?error=1")
 
     c['pageTitle'] = theCompo.name
     c['compo'] = theCompo
