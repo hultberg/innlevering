@@ -1,0 +1,3 @@
+Innlevering
+requests>=2.7.0
+django==1.8.4
