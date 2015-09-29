@@ -45,7 +45,7 @@ def ge_has_valid_ticket(user):
 	numberOfTickets = 0
 
 	try:
-		numberOfTickets = int(result.text())
+		numberOfTickets = int(result.text)
 	except ValueError:
 		return False
 
