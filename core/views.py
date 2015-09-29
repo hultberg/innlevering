@@ -48,15 +48,15 @@ def compoview(request, composlug):
     c['bidrags'] = theCompo.get_bidrag()
 
     # User has already sent bidrag?
-    bidragUserCompo = Bidrag.objects.filter(compo=theCompo, creator=request.user)
-    if bidragUserCompo.count() > 0:
-        bidragUserCompo = bidragUserCompo[0]
-        c['userHasBidragID'] = bidragUserCompo
-
     if request.user.is_authenticated():
         c['isLoggedin'] = True
         c['user'] = request.user
         c['isCrew'] = user_is_crew(request.user)
+
+        bidragUserCompo = Bidrag.objects.filter(compo=theCompo, creator=request.user)
+        if bidragUserCompo.count() > 0:
+            bidragUserCompo = bidragUserCompo[0]
+            c['userHasBidragID'] = bidragUserCompo        
 
     return render(request, 'compos/view.html', c)
 
