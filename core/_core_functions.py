@@ -1,4 +1,5 @@
 import requests
+from core.models import InnleveringUser
 
 def user_has_group(user, groupName):
     # Determine if a user is in a group
