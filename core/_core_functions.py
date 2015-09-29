@@ -32,25 +32,26 @@ def can_upload(user):
 def ge_has_valid_ticket(user):
 	# Fetch the innlevering user of this one.
 	innleveringuser = get_innlevering_user(user)
-	
-	data = {
-		"user_id": innleveringuser.geID,
-		"token": innleveringuser.currenttoken,
-		"timestamp": innleveringuser.currenttimestamp,
-		"eventID": 82
-	}
 
-	result = requests.post("https://www.geekevents.org/sso/user-has-tickets/", params=data)
+	if innleveringuser:	
+		data = {
+			"user_id": innleveringuser.geID,
+			"token": innleveringuser.currenttoken,
+			"timestamp": innleveringuser.currenttimestamp,
+			"eventID": 82
+		}
 
-	numberOfTickets = 0
+		result = requests.post("https://www.geekevents.org/sso/user-has-tickets/", params=data)
 
-	try:
-		numberOfTickets = int(result.text)
-	except ValueError:
-		return False
+		numberOfTickets = 0
 
-	# Validate number of tickets
-	if numberOfTickets > 0:
-		return True
+		try:
+			numberOfTickets = int(result.text)
+		except ValueError:
+			return False
+
+		# Validate number of tickets
+		if numberOfTickets > 0:
+			return True
 
 	return False
