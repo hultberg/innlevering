@@ -229,11 +229,13 @@ def uploadview(request, composlug):
     c['user'] = request.user
 
     # fetch compo
-    c['compo'] = get_object_or_404(Compo, id=composlug)
+    theCompo = get_object_or_404(Compo, id=composlug)
 
     # is the compo published?
     if not theCompo.isPublished:
         return HttpResponseRedirect("/?error=1")
+
+    c['compo'] = theCompo
 
     return render(request, 'upload.html', c)
 
