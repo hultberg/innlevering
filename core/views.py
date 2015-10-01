@@ -1,14 +1,14 @@
 
 # coding=utf-8
+import requests
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from core._core_functions import user_is_crew, get_innlevering_user, can_upload
-import requests
 
-from .models import Compo, Bidrag, BidragFile, InnleveringUser
+from core._core_functions import user_is_crew, get_innlevering_user, can_upload, has_voted
+from .models import Compo, Bidrag, BidragFile, InnleveringUser, UserVote
 
 
 def indexview(request):
@@ -47,6 +47,15 @@ def compoview(request, composlug):
     c['compo'] = theCompo
     c['bidrags'] = theCompo.get_bidrag()
 
+    if (theCompo.isVotingMode):
+        return compovotingview(request, c)
+
+    return componormalview(request, c)
+
+
+def componormalview(request, c):
+    theCompo = c['compo']
+
     # User has already sent bidrag?
     if request.user.is_authenticated():
         c['isLoggedin'] = True
@@ -56,9 +65,19 @@ def compoview(request, composlug):
         bidragUserCompo = Bidrag.objects.filter(compo=theCompo, creator=request.user)
         if bidragUserCompo.count() > 0:
             bidragUserCompo = bidragUserCompo[0]
-            c['userHasBidragID'] = bidragUserCompo        
+            c['userHasBidragID'] = bidragUserCompo
 
     return render(request, 'compos/view.html', c)
+
+
+def compovotingview(request, c):
+    # User has already sent bidrag?
+    if request.user.is_authenticated():
+        c['isLoggedin'] = True
+        c['user'] = request.user
+        c['isCrew'] = user_is_crew(request.user)
+
+    return render(request, 'compos/voting.html', c)
 
 
 # ----------------------------------------------------
@@ -114,6 +133,7 @@ def composinglebidragview(request, composlug, bidragslug):
 
     # Check if user in session has access to this page.
     # Only crew or uploader can view.
+    # When in voting mode, everyone can view an bidrag.
     if not theCompo.isVotingMode and not user_is_crew(request.user) and not isOwner:
         return HttpResponseForbidden("No access")  # No access to view this..
 
@@ -127,6 +147,7 @@ def composinglebidragview(request, composlug, bidragslug):
     c['user'] = request.user
     c['isCrew'] = user_is_crew(request.user)
     c['hasAccess'] = True  # Access forbidden is be catched over
+    c['compoIsVoting'] = theCompo.isVotingMode
 
     # Show success message?
     if request.GET.get("uploaded", False):
@@ -168,6 +189,44 @@ def bidragdelete(request, composlug, bidragslug):
 
     # Redir to compo
     return HttpResponseRedirect("/view/" + str(theCompo.id) + "/")
+
+
+# ----------------------------------------------------
+# View single bidrag in compo
+def bidragvote(request, composlug, bidragslug):
+    c = {}
+
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    # fetch compo
+    try:
+        theCompo = Compo.objects.get(pk=composlug)
+        theBidrag = Bidrag.objects.get(id=bidragslug, compo=theCompo)
+    except Compo.DoesNotExist:
+        raise Http404("Compo was not found")
+    except Bidrag.DoesNotExist:
+        raise Http404("Bidrag was not found")
+
+    isOwner = (request.user.id == theBidrag.creator.id)
+
+    if has_voted(request.user, theBidrag):
+        return HttpResponseRedirect("/view/" + str(theCompo.id) + "/?voted=false&hasvoted=true#b" + str(theBidrag.id))
+
+    # Check if user in session has access to this page.
+    # Only crew or uploader can view.
+    if not theCompo.isVotingMode or isOwner:
+        return HttpResponseRedirect("/view/" + str(theCompo.id) + "/?voted=false#b" + str(theBidrag.id))
+
+    # Add one vote to this bidrag.
+    theBidrag.votes += 1
+    theBidrag.save()
+
+    vote = UserVote(user=request.user, bidrag=theBidrag)
+    vote.save()
+
+    # Redir to compo
+    return HttpResponseRedirect("/view/" + str(theCompo.id) + "/?voted=true#b" + str(theBidrag.id))
 
 
 # ----------------------------------------------------

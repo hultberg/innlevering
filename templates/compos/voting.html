@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <h1>{{compo.name}}</h1>
+    <h2>Stem på alle bidrag sendt inn.</h2>
+</div>
+
+<div class="content">
+    {% if not isLoggedin %}
+        <p><strong>For å stemme på et bidrag må du være innlogget.</strong></p>
+    {% endif %}
+
+    {% if bidrags %}
+        <div class="bidrag-list">
+        {% for bidrag in bidrags %}
+            <div class="bidrag">
+                {% if isLoggedin %}
+                <div class="vote-on"><button class="pure-button pure-button-primary" onclick="window.location='{% url 'core:bidragvote' compo.id bidrag.id %}';">Stem</button></div>
+                {% endif %}
+                <div class="container">
+                    {% if bidrag.get_thebidrag_file %}
+                        <div class="thumbnail">
+                            <img src="{{bidrag.get_thebidrag_file.file.url}}" alt="Image" />
+                        </div>
+                    {% endif %}
+                    <h4><a href="{% url 'core:viewsinglebidrag' compo.id bidrag.id %}">{{bidrag.name}}</a></h4>
+                    {% if bidrag.data %}
+                        <p>{{bidrag.data}}</p>
+                    {% endif %}
+                    <p class="meta"><em>Innsendt {{bidrag.created|date:'d.n.Y G:i:s'}} fra {{bidrag.creator_name}}</em></p>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p><em>Ingen bidrag er blitt sendt inn.</em></p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -279,6 +279,11 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     margin: 0;
 }
 
+.bidrag-list .bidrag .vote-on {
+    float: right;
+    margin-top: 15px;
+}
+
 .files {
     width: 50%;
     display: inline-block;
@@ -309,4 +314,10 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1;
+}
+
+.footnote {
+    font-style: italic;
+    font-size: 0.75rem;
+    color: #666666; 
 }

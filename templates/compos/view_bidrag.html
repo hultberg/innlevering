@@ -20,6 +20,9 @@
         {% endif %}
         <a class="pure-button" href="javascript:void(0);" onclick="toggleEditMode();">Rediger</a>
         <a class="pure-button" href="{% url 'core:bidragdelete' compo.id bidrag.id %}">Slett</a>
+        {% if isLoggedin and compoIsVoting %}
+        <a class="pure-button pure-button-primary" href="{% url 'core:bidragvote' compo.id bidrag.id %}">Stem</a>
+        {% endif %}
     </p>
 
     <form class="editform" action="{% url 'core:bidrageditsave' compo.id bidrag.id %}" method="post">
