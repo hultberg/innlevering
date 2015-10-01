@@ -79,3 +79,15 @@ class BidragFile(models.Model):
     #
     def __str__(self):
         return self.bidrag.name + "_fil" + str(self.id)
+
+
+class UserVote(models.Model):
+    bidrag = models.ForeignKey("Bidrag")
+    user = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('bidrag', 'user',)
+
+    #
+    def __str__(self):
+        return self.user.username + " vote on bID: " + str(self.bidrag.id) 
