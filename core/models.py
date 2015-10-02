@@ -46,8 +46,11 @@ class Bidrag(models.Model):
     data = models.TextField()
     created = models.DateTimeField(auto_now=True)
     compo = models.ForeignKey("Compo")
-    creator = models.ForeignKey(User, unique=True)
+    creator = models.ForeignKey(User, unique=False)
     votes = models.IntegerField()
+
+    class Meta:
+        unique_together = ('compo', 'creator',)	
 
     #
     def __str__(self):
