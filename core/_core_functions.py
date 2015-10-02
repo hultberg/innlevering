@@ -1,5 +1,5 @@
 import requests
-from core.models import InnleveringUser, UserVote
+from core.models import InnleveringUser, UserVote, Bidrag
 
 def user_has_group(user, groupName):
     # Determine if a user is in a group
@@ -13,10 +13,21 @@ def user_is_crew(user):
     return user_has_group(user, "Crew")
 
 
-def has_voted(user, bidrag):
+def has_voted(user, bidrag, compo):
     vote = UserVote.objects.filter(user=user, bidrag=bidrag)
 
     if vote.count() > 0:
+    	return True
+
+    # Has voted in compo?
+    voted = UserVote.objects.filter(user=user)
+
+    if voted.count() > 0:
+    	for vote in voted:
+    		thisvoted = Bidrag.objects.filter(id=vote.bidrag.id)
+    		if thisvoted.count() > 0:
+    			return True
+
     	return True
 
     return False
