@@ -50,6 +50,9 @@ def compoview(request, composlug):
     if (theCompo.isVotingMode):
         return compovotingview(request, c)
 
+    if request.GET.get("shighvote"):
+        c['bidrags'] = Bidrag.objects.order_by("-votes")
+
     return componormalview(request, c)
 
 
