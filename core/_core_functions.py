@@ -19,17 +19,7 @@ def has_voted(user, bidrag, compo):
     if vote.count() > 0:
     	return True
 
-    # Has voted in compo?
-    voted = UserVote.objects.filter(user=user)
-
-    if voted.count() > 0:
-    	for vote in voted:
-    		thisvoted = Bidrag.objects.filter(id=vote.bidrag.id)
-    		if thisvoted.count() > 0:
-    			return True
-
-    	return True
-
+    	
     return False
 
 
