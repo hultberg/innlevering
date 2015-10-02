@@ -105,6 +105,9 @@ def compobidragview(request, composlug):
     c['user'] = request.user
     c['isCrew'] = user_is_crew(request.user)
 
+    if request.GET.get("shighvote"):
+        c['bidrags'] = Bidrag.objects.order_by("-votes")
+
     return render(request, 'compos/see_bidrags.html', c)
 
 
