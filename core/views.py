@@ -47,11 +47,11 @@ def compoview(request, composlug):
     c['compo'] = theCompo
     c['bidrags'] = theCompo.get_bidrag()
 
-    if (theCompo.isVotingMode):
-        return compovotingview(request, c)
-
     if request.GET.get("shighvote"):
         c['bidrags'] = Bidrag.objects.order_by("-votes")
+
+    if (theCompo.isVotingMode):
+        return compovotingview(request, c)
 
     return componormalview(request, c)
 
