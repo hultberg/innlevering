@@ -3,4 +3,4 @@ Innlevering til kreative på PolarParty 24
 
 # License
 
-MIT License
+See license
