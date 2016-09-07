@@ -1,5 +1,5 @@
-# ppinnlevering
-Innlevering til kreative på PolarParty 24
+# innlevering
+Innleveringssystem
 
 # License
 
